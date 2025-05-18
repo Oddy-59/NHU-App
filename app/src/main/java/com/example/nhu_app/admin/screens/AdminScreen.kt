@@ -1,21 +1,20 @@
 package com.example.nhu_app.admin.screens
 
+import DrawerContent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.navigation.compose.rememberNavController
@@ -24,20 +23,23 @@ import com.example.nhu_app.components.BottomNavigationItem
 import kotlinx.coroutines.delay
 import androidx.navigation.NavController
 import com.example.nhu_app.navigation.Screen
-import com.example.nhu_app.components.DrawerContent
 import kotlinx.coroutines.launch
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminScreen(navController: NavController) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val colorScheme = MaterialTheme.colorScheme
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            DrawerContent(drawerState, scope) // Use the DrawerContent composable
+            DrawerContent(
+                drawerState = drawerState,
+                scope = scope,
+                navController = navController
+            )
         }
     ) {
         Scaffold(
@@ -48,33 +50,34 @@ fun AdminScreen(navController: NavController) {
                             modifier = Modifier.fillMaxWidth(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.logo),
-                                contentDescription = "NHU Logo",
-                                modifier = Modifier.size(60.dp),
-                                colorFilter = ColorFilter.tint(Color.White)
+                            Text(
+                                text = "Admin Dashboard",
+                                color = colorScheme.onPrimary,
+                                fontWeight = FontWeight.Bold
                             )
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.DarkGray)
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = colorScheme.primary
+                    )
                 )
             },
             bottomBar = {
                 BottomAppBar(
-                    containerColor = Color.DarkGray,
+                    containerColor = colorScheme.primary,
                     modifier = Modifier.height(70.dp)
                 ) {
                     BottomNavigationItem(R.drawable.ic_home, "Home") {
                         navController.navigate(Screen.Home.route)
                     }
-                    BottomNavigationItem(R.drawable.ic_fixtures, "Fixtures") {
-                        navController.navigate(Screen.Fixtures.route)
+                    BottomNavigationItem(R.drawable.ic_events, "Events") {
+                        navController.navigate(Screen.Events.route)
                     }
-                    BottomNavigationItem(R.drawable.ic_rankings, "Rankings") {
-                        navController.navigate(Screen.Rankings.route)
+                    BottomNavigationItem(R.drawable.ic_news, "News") {
+                        navController.navigate(Screen.News.route)
                     }
-                    BottomNavigationItem(R.drawable.ic_teams, "Teams") {
-                        navController.navigate(Screen.Teams.route)
+                    BottomNavigationItem(R.drawable.ic_clubs, "Clubs") {
+                        navController.navigate(Screen.Clubs.route)
                     }
                     BottomNavigationItem(R.drawable.ic_menu, "More") {
                         scope.launch { drawerState.open() }
@@ -86,37 +89,37 @@ fun AdminScreen(navController: NavController) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(top = 16.dp),
+                    .padding(horizontal = 16.dp, vertical = 20.dp),
+                verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        BoxItem(R.drawable.ic_team, "Team Registration") {
-                            navController.navigate(Screen.TeamRegistration.route)
-                        }
-                        BoxItem(R.drawable.ic_player, "Player Registration") {
-                            navController.navigate(Screen.PlayerRegistration.route)
-                        }
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        BoxItem(R.drawable.ic_event, "Events") {
-                            navController.navigate(Screen.Events.route)
-                        }
-                        BoxItem(R.drawable.ic_info, "Information") {
-                            navController.navigate(Screen.AdminInfo.route)
-                        }
-                    }
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Text(
+                    text = "Manage NHU info...",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        color = MaterialTheme.colorScheme.onBackground
+                    ),
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                BoxItemAS(R.drawable.ic_team, "Team Registration") {
+                    navController.navigate(Screen.TeamReg.route)
+                }
+                BoxItemAS(R.drawable.ic_player, "Player Registration") {
+                    navController.navigate(Screen.PlayerReg.route)
+                }
+                BoxItemAS(R.drawable.ic_event, "Event Entries") {
+                    navController.navigate(Screen.Entry.route)
+                }
+                BoxItemAS(R.drawable.ic_info, "Info Sharing") {
+                    navController.navigate(Screen.Info.route)
+                }
+                BoxItemAS(R.drawable.ic_club, "Add A Club") {
+                    navController.navigate(Screen.Club.route)
                 }
             }
         }
@@ -124,53 +127,59 @@ fun AdminScreen(navController: NavController) {
 }
 
 @Composable
-fun BoxItem(image: Int, label: String, onClick: () -> Unit) {
-    val interactionSource = remember { MutableInteractionSource() }
+fun BoxItemAS(image: Int, label: String, onClick: () -> Unit) {
     var isPressed by remember { mutableStateOf(false) }
-
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 1.1f else 1f,
-        animationSpec = tween(durationMillis = 200),
-        label = "boxBounce"
+        targetValue = if (isPressed) 1.02f else 1f,
+        animationSpec = tween(durationMillis = 150),
+        label = "scaleAnim"
     )
+
+    val colorScheme = MaterialTheme.colorScheme
 
     LaunchedEffect(isPressed) {
         if (isPressed) {
-            delay(150)
+            delay(100)
             isPressed = false
             onClick()
         }
     }
 
-    Column(
+    Surface(
+        tonalElevation = 3.dp,
+        shadowElevation = 3.dp,
+        shape = RoundedCornerShape(14.dp),
         modifier = Modifier
-            .padding(15.dp)
-            .clip(RoundedCornerShape(30.dp))
-            .background(Color.LightGray)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) {
-                isPressed = true
-            }
+            .fillMaxWidth(0.9f)
+            .padding(vertical = 8.dp)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
             }
-            .size(140.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .clickable { isPressed = true },
+        color = colorScheme.secondaryContainer
     ) {
-        Image(
-            painter = painterResource(id = image),
-            contentDescription = label,
-            modifier = Modifier.size(55.dp)
-        )
-        Text(
-            text = label,
-            fontSize = 13.sp,
-            modifier = Modifier.padding(top = 8.dp)
-        )
+        Row(
+            modifier = Modifier
+                .height(70.dp)
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = image),
+                contentDescription = label,
+                modifier = Modifier
+                    .size(36.dp)
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Text(
+                text = label,
+                fontSize = 16.sp,
+                color = colorScheme.onSecondaryContainer
+            )
+        }
     }
 }
 

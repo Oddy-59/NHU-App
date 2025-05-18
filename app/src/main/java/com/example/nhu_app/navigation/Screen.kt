@@ -1,18 +1,18 @@
 package com.example.nhu_app.navigation
 
 sealed class Screen(val route: String) {
-    object StartUp : Screen("startup")
-    object SignUp : Screen("signup")
+    object Login : Screen("Login")
     object Home : Screen("home")
-    object Fixtures : Screen("fixtures")
-    object Rankings : Screen("rankings")
-    object Teams : Screen("teams")
+    object Events : Screen("events")
+    object News : Screen("news")
+    object Clubs : Screen("clubs")
     object Admin : Screen("admin")
     object More : Screen("more")
 
     // Admin Functional Screens
-    object TeamRegistration : Screen("team_registration")
-    object PlayerRegistration : Screen("player_registration")
-    object Events : Screen("events")
-    object AdminInfo : Screen("admin_info")
+    object TeamReg : Screen("team_reg")
+    object PlayerReg : Screen("player_reg")
+    object Entry : Screen("entries")
+    object Info : Screen("info")
+    object Club : Screen("club")
 }
