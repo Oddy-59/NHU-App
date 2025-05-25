@@ -28,6 +28,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.nhu_app.R
 import com.example.nhu_app.components.BottomNavigationItem
 import DrawerContent
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import com.example.nhu_app.models.NewsItem
 import com.example.nhu_app.models.ScoreItem
 import com.example.nhu_app.models.GalleryItem
@@ -100,12 +102,28 @@ fun HomeScreen(navController: NavController) {
             topBar = {
                 TopAppBar(
                     title = {
-                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            Text(
-                                "NHU HOME",
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontWeight = FontWeight.Bold
-                            )
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.logo2), // Replace with your actual logo resource
+                                    contentDescription = "NHU Logo",
+                                    modifier = Modifier
+                                        .size(47.dp)
+                                        .padding(end = 5.dp),
+                                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary) // Match text color
+                                )
+                                Text(
+                                    text = "NHU HOME",
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 20.sp
+                                )
+                            }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -215,7 +233,7 @@ fun HomeScreen(navController: NavController) {
                                     ) {
                                         Column(Modifier.padding(16.dp)) {
                                             Text(
-                                                "${score.teams} - ${score.score}",
+                                                "${score.teams} | ${score.score}",
                                                 fontWeight = FontWeight.Bold,
                                                 color = MaterialTheme.colorScheme.onSecondaryContainer
                                             )
@@ -297,34 +315,62 @@ fun SectionHeader(title: String) {
 
 @Composable
 fun TeamsSection() {
-    val teams = listOf("Windhoek Warriors", "Desert Hawks", "Coastal Strikers")
+    val teams = remember { mutableStateListOf<String>() }
+    var isLoading by remember { mutableStateOf(true) }
 
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        items(teams) { team ->
-            Card(
-                shape = RoundedCornerShape(10.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                ),
-                modifier = Modifier
-                    .width(150.dp)
-                    .height(80.dp)
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Text(
-                        text = team,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+    LaunchedEffect(Unit) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("teams")
+            .limit(7) // Fetch up to 20 teams
+            .get()
+            .addOnSuccessListener { result ->
+                val allTeams = result.mapNotNull { it.getString("teamName") }.shuffled()
+                teams.clear()
+                teams.addAll(allTeams.take(4)) // Show only 5 random teams
+                isLoading = false
+            }
+            .addOnFailureListener {
+                isLoading = false
+            }
+    }
+
+    when {
+        isLoading -> {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        }
+        teams.isEmpty() -> {
+            Text("No teams available", style = MaterialTheme.typography.bodyMedium)
+        }
+        else -> {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                items(teams) { team ->
+                    Card(
+                        shape = RoundedCornerShape(10.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        ),
+                        modifier = Modifier
+                            .width(150.dp)
+                            .height(80.dp)
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Text(
+                                text = team,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                    }
                 }
             }
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

@@ -1,6 +1,7 @@
 package com.example.nhu_app.admin.screens
 
 import DrawerContent
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -23,6 +24,7 @@ import com.example.nhu_app.components.BottomNavigationItem
 import kotlinx.coroutines.delay
 import androidx.navigation.NavController
 import com.example.nhu_app.navigation.Screen
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +33,9 @@ fun AdminScreen(navController: NavController) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val colorScheme = MaterialTheme.colorScheme
+
+    // Prevent back navigation from Admin screen
+    BackHandler {}
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -51,7 +56,7 @@ fun AdminScreen(navController: NavController) {
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "Admin Dashboard",
+                                text = "Dashboard",
                                 color = colorScheme.onPrimary,
                                 fontWeight = FontWeight.Bold
                             )
@@ -85,46 +90,68 @@ fun AdminScreen(navController: NavController) {
                 }
             }
         ) { paddingValues ->
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(horizontal = 16.dp, vertical = 20.dp),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(20.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp, vertical = 20.dp),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(40.dp))
 
-                Text(
-                    text = "Manage NHU info...",
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.headlineSmall.copy(
-                        color = MaterialTheme.colorScheme.onBackground
-                    ),
-                    modifier = Modifier.padding(bottom = 24.dp)
-                )
+                    Text(
+                        text = "Manage Hockey Info",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            color = MaterialTheme.colorScheme.onBackground
+                        ),
+                        modifier = Modifier.padding(bottom = 24.dp)
+                    )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                BoxItemAS(R.drawable.ic_team, "Team Registration") {
-                    navController.navigate(Screen.TeamReg.route)
+                    BoxItemAS(R.drawable.ic_team, "Team Registration") {
+                        navController.navigate(Screen.TeamReg.route)
+                    }
+                    BoxItemAS(R.drawable.ic_player, "Player Registration") {
+                        navController.navigate(Screen.PlayerReg.route)
+                    }
+                    BoxItemAS(R.drawable.ic_event, "Event Entries") {
+                        navController.navigate(Screen.Entry.route)
+                    }
+                    BoxItemAS(R.drawable.ic_info, "Info Sharing") {
+                        navController.navigate(Screen.Info.route)
+                    }
+                    BoxItemAS(R.drawable.ic_club, "Add A Club") {
+                        navController.navigate(Screen.Club.route)
+                    }
                 }
-                BoxItemAS(R.drawable.ic_player, "Player Registration") {
-                    navController.navigate(Screen.PlayerReg.route)
-                }
-                BoxItemAS(R.drawable.ic_event, "Event Entries") {
-                    navController.navigate(Screen.Entry.route)
-                }
-                BoxItemAS(R.drawable.ic_info, "Info Sharing") {
-                    navController.navigate(Screen.Info.route)
-                }
-                BoxItemAS(R.drawable.ic_club, "Add A Club") {
-                    navController.navigate(Screen.Club.route)
+
+                Button(
+                    onClick = {
+                        FirebaseAuth.getInstance().signOut()
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(0) // Clears the back stack
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
+                ) {
+                    Text("Logout", color = colorScheme.onError)
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun BoxItemAS(image: Int, label: String, onClick: () -> Unit) {
@@ -183,7 +210,7 @@ fun BoxItemAS(image: Int, label: String, onClick: () -> Unit) {
     }
 }
 
-@Preview(showBackground = true, name = "Admin Screen")
+@Preview(showBackground = true)
 @Composable
 fun PreviewAdminScreen() {
     val navController = rememberNavController()

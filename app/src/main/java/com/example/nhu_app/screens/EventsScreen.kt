@@ -105,14 +105,14 @@ fun EventsScreen(navController: NavController) {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
-                    // Heading styled like Latest News header
+                    Spacer(modifier = Modifier.height(20.dp))
                     Text(
-                        text = "Upcoming Events",
+                        text = "Upcoming Events:",
                         fontSize = 20.sp, // same as Latest News header font size
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground // matches Latest News header color
                     )
-                    Spacer(modifier = Modifier.height(7.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                 }
 
                 item {
@@ -147,19 +147,13 @@ fun EventsScreen(navController: NavController) {
                                     ) {
                                         Column(Modifier.padding(16.dp)) {
                                             Text(
-                                                event.title,
+                                                "${event.title} - ${event.venue}",
                                                 fontWeight = FontWeight.Bold,
                                                 color = MaterialTheme.colorScheme.onSecondaryContainer
                                             )
                                             Spacer(Modifier.height(3.dp))
                                             Text(
-                                                event.date,
-                                                fontSize = 13.sp,
-                                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
-                                            )
-                                            Spacer(Modifier.height(1.dp))
-                                            Text(
-                                                "Venue: ${event.venue}",
+                                                "Date: ${event.date}",
                                                 fontSize = 13.sp,
                                                 color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
                                             )

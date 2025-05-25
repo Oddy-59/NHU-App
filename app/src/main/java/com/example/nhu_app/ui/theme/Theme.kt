@@ -23,7 +23,6 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color.Black
 )
 
-// Dark color scheme using your colors
 private val DarkColorScheme = darkColorScheme(
     primary = TealPrimaryDark,
     secondary = IndigoSecondaryDark,

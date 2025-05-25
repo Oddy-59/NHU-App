@@ -23,6 +23,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.nhu_app.R
 import com.example.nhu_app.components.BottomNavigationItem
 import DrawerContent
+import androidx.compose.ui.res.painterResource
 import com.example.nhu_app.models.Club
 import com.example.nhu_app.navigation.Screen
 import com.google.firebase.firestore.FirebaseFirestore
@@ -162,14 +163,17 @@ fun ClubCard(club: Club, expanded: Boolean, onClick: () -> Unit) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val painter = rememberAsyncImagePainter(model = Uri.parse(club.imageUrl))
+            val imagePainter = if (club.imageUrl.isNotBlank()) {
+                rememberAsyncImagePainter(model = Uri.parse(club.imageUrl))
+            } else {
+                painterResource(R.drawable.ic_clubs) // your placeholder image here
+            }
             Image(
-                painter = painter,
-                contentDescription = "${club.name} Logo",
-                contentScale = ContentScale.Crop,
+                painter = imagePainter,
+                contentDescription = null,
                 modifier = Modifier
-                    .size(120.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .size(80.dp),
+                contentScale = ContentScale.Crop
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -195,4 +199,5 @@ fun ClubCard(club: Club, expanded: Boolean, onClick: () -> Unit) {
         }
     }
 }
+
 

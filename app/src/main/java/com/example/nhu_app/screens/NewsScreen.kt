@@ -94,19 +94,6 @@ fun NewsScreen(navController: NavController) {
                             )
                         }
                     },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            scope.launch {
-                                drawerState.open()
-                            }
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = "Menu",
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                    },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary
                     )
@@ -181,16 +168,17 @@ fun NewsScreen(navController: NavController) {
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(horizontal = 16.dp, vertical = 8.dp)
-                                .background(MaterialTheme.colorScheme.background)
+                                .background(MaterialTheme.colorScheme.background) ,
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "Stay up to date with the latest news from the NHU...",
-                                fontSize = 20.sp,
+                                text = "Latest Hockey Articles",
+                                fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onBackground,
                                 modifier = Modifier.padding(bottom = 16.dp)
                             )
-
+                            Spacer(modifier = Modifier.height(20.dp))
                             LazyColumn {
                                 items(newsList) { news ->
                                     NewsCard(newsItem = news, navController = navController)
@@ -214,6 +202,14 @@ fun NewsCard(newsItem: NewsItem, navController: NavController) {
             .fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+
+            Text(
+                text = newsItem.title,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+
             newsItem.imageUri?.let {
                 Image(
                     painter = rememberAsyncImagePainter(model = "file://$it"),
@@ -226,13 +222,6 @@ fun NewsCard(newsItem: NewsItem, navController: NavController) {
                         .padding(bottom = 8.dp)
                 )
             }
-
-            Text(
-                text = newsItem.title,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
-            )
 
             Text(
                 text = newsItem.date,

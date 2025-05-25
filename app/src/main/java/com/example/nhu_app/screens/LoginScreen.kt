@@ -1,8 +1,6 @@
 package com.example.nhu_app.screens
 
-import android.content.Context
 import android.util.Patterns
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,7 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,201 +45,222 @@ fun LoginScreen(navController: NavController) {
         return Patterns.EMAIL_ADDRESS.matcher(input).matches()
     }
 
+    fun isValidPassword(pw: String): Boolean {
+        return pw.length in 6..10 && pw.any { !it.isLetterOrDigit() }
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
-        Column(
+
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(20.dp)
-                .background(colorScheme.background),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
         ) {
-            Spacer(modifier = Modifier.height(15.dp))
-
-            Text(
-                text = "Welcome Admin!",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorScheme.onBackground,
+            Column(
                 modifier = Modifier
-                    .padding(top = 20.dp, bottom = 12.dp)
-                    .align(Alignment.CenterHorizontally)
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Icon(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "App Logo",
-                tint = colorScheme.primary,
-                modifier = Modifier
-                    .size(140.dp)
-                    .padding(bottom = 24.dp)
-            )
-
-            Spacer(modifier = Modifier.height(50.dp))
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .wrapContentHeight(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer
-                )
+                    .fillMaxSize()
+                    .padding(20.dp)
+                    .background(colorScheme.background),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Text(
+                    text = "Welcome Admin!",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorScheme.onBackground,
+                    modifier = Modifier
+                        .padding(top = 20.dp, bottom = 12.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                Icon(
+                    painter = painterResource(id = R.drawable.logo1),
+                    contentDescription = "App Logo",
+                    tint = colorScheme.primary,
+                    modifier = Modifier
+                        .size(140.dp)
+                        .padding(bottom = 24.dp)
+                )
+
+                Spacer(modifier = Modifier.height(50.dp))
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .wrapContentHeight(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
                 ) {
-                    Text(
-                        text = "Login",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = colorScheme.onSurface,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-
-                    OutlinedTextField(
-                        value = emailInput,
-                        onValueChange = {
-                            emailInput = it
-                            emailError = false
-                        },
-                        label = { Text("Email", color = colorScheme.onSurface) },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_email),
-                                contentDescription = "Email Icon",
-                                modifier = Modifier.size(20.dp),
-                                tint = colorScheme.primary
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 6.dp),
-                        textStyle = LocalTextStyle.current.copy(color = colorScheme.onSurface)
-                    )
-
-                    if (emailError) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text(
-                            text = "Please enter a valid email address.",
-                            color = MaterialTheme.colorScheme.error,
-                            fontSize = 12.sp,
-                            modifier = Modifier
-                                .align(Alignment.Start)
-                                .padding(start = 4.dp, bottom = 4.dp)
+                            text = "Login",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colorScheme.onSurface,
+                            modifier = Modifier.padding(bottom = 16.dp)
                         )
-                    }
 
-                    OutlinedTextField(
-                        value = passwordInput,
-                        onValueChange = { passwordInput = it },
-                        label = { Text("Password", color = colorScheme.onSurface) },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_password),
-                                contentDescription = "Password Icon",
-                                modifier = Modifier.size(20.dp),
-                                tint = colorScheme.primary
-                            )
-                        },
-                        trailingIcon = {
-                            val visibilityIcon = if (isPasswordVisible)
-                                painterResource(id = R.drawable.ic_hide_password)
-                            else
-                                painterResource(id = R.drawable.ic_show_password)
-
-                            IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                        OutlinedTextField(
+                            value = emailInput,
+                            onValueChange = {
+                                emailInput = it
+                                emailError = false
+                            },
+                            label = { Text("Email", color = colorScheme.onSurface) },
+                            leadingIcon = {
                                 Icon(
-                                    painter = visibilityIcon,
-                                    contentDescription = "Toggle Password Visibility",
+                                    painter = painterResource(id = R.drawable.ic_email),
+                                    contentDescription = "Email Icon",
                                     modifier = Modifier.size(20.dp),
                                     tint = colorScheme.primary
                                 )
-                            }
-                        },
-                        visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                if (emailInput.isNotBlank() && passwordInput.length >= 6) {
-                                    loginWithFirebase(
-                                        emailInput,
-                                        passwordInput,
-                                        navController,
-                                        snackbarHostState,
-                                        coroutineScope
-                                    ) { loading = it }
-                                }
-                            }
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 4.dp),
-                        textStyle = LocalTextStyle.current.copy(color = colorScheme.onSurface)
-                    )
-
-                    if (passwordInput.isNotEmpty() && passwordInput.length < 6) {
-                        Text(
-                            text = "Password must be at least 6 characters",
-                            color = MaterialTheme.colorScheme.error,
-                            fontSize = 12.sp,
+                            },
+                            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                             modifier = Modifier
-                                .align(Alignment.Start)
-                                .padding(start = 4.dp, bottom = 4.dp)
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp),
+                            textStyle = LocalTextStyle.current.copy(color = colorScheme.onSurface)
                         )
-                    }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                        if (emailError) {
+                            Text(
+                                text = "Please enter a valid email address.",
+                                color = MaterialTheme.colorScheme.error,
+                                fontSize = 12.sp,
+                                modifier = Modifier
+                                    .align(Alignment.Start)
+                                    .padding(start = 4.dp, bottom = 4.dp)
+                            )
+                        }
 
-                    if (loading) {
-                        CircularProgressIndicator(
-                            color = colorScheme.primary,
-                            modifier = Modifier.padding(vertical = 8.dp)
+                        OutlinedTextField(
+                            value = passwordInput,
+                            onValueChange = {
+                                if (it.length <= 10) passwordInput = it
+                            },
+                            label = { Text("Password", color = colorScheme.onSurface) },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_password),
+                                    contentDescription = "Password Icon",
+                                    modifier = Modifier.size(20.dp),
+                                    tint = colorScheme.primary
+                                )
+                            },
+                            trailingIcon = {
+                                val visibilityIcon = if (isPasswordVisible)
+                                    painterResource(id = R.drawable.ic_hide_password)
+                                else
+                                    painterResource(id = R.drawable.ic_show_password)
+
+                                IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                                    Icon(
+                                        painter = visibilityIcon,
+                                        contentDescription = "Toggle Password Visibility",
+                                        modifier = Modifier.size(20.dp),
+                                        tint = colorScheme.primary
+                                    )
+                                }
+                            },
+                            visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    if (emailInput.isNotBlank() && isValidPassword(passwordInput)) {
+                                        loginWithFirebase(
+                                            emailInput,
+                                            passwordInput,
+                                            navController,
+                                            snackbarHostState,
+                                            coroutineScope
+                                        ) { loading = it }
+                                    }
+                                }
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 4.dp),
+                            textStyle = LocalTextStyle.current.copy(color = colorScheme.onSurface)
                         )
-                    }
 
-                    Button(
-                        onClick = {
-                            if (emailInput.isNotBlank() && passwordInput.length >= 6) {
-                                if (isValidEmail(emailInput)) {
-                                    loginWithFirebase(
-                                        emailInput,
-                                        passwordInput,
-                                        navController,
-                                        snackbarHostState,
-                                        coroutineScope
-                                    ) { loading = it }
+                        if (passwordInput.isNotEmpty() && !isValidPassword(passwordInput)) {
+                            Text(
+                                text = "Password must be 6–10 characters and include 1 symbol",
+                                color = MaterialTheme.colorScheme.error,
+                                fontSize = 12.sp,
+                                modifier = Modifier
+                                    .align(Alignment.Start)
+                                    .padding(start = 4.dp, bottom = 4.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Button(
+                            onClick = {
+                                if (emailInput.isNotBlank() && passwordInput.isNotBlank()) {
+                                    if (!isValidEmail(emailInput)) {
+                                        emailError = true
+                                    } else if (!isValidPassword(passwordInput)) {
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                "Password must be 6–10 characters and should contain atleast one symbol"
+                                            )
+                                        }
+                                    } else {
+                                        loginWithFirebase(
+                                            emailInput,
+                                            passwordInput,
+                                            navController,
+                                            snackbarHostState,
+                                            coroutineScope
+                                        ) { loading = it }
+                                    }
                                 } else {
-                                    emailError = true
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("Please enter the required fields")
+                                    }
                                 }
-                            } else {
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar("Please enter the required fields")
-                                }
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
-                        enabled = !loading
-                    ) {
-                        Text("Login", fontSize = 16.sp, color = colorScheme.onPrimary)
-                    }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
+                            enabled = !loading
+                        ) {
+                            Text("Login", fontSize = 16.sp, color = colorScheme.onPrimary)
+                        }
 
-                    Spacer(modifier = Modifier.height(15.dp))
+                        Spacer(modifier = Modifier.height(15.dp))
+                    }
+                }
+            }
+
+            // Full-screen loading overlay
+            if (loading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.4f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = colorScheme.primary)
                 }
             }
         }
     }
 }
-
-
 
 // Firebase Authentication logic
 fun loginWithFirebase(
@@ -263,14 +282,12 @@ fun loginWithFirebase(
                     popUpTo("login") { inclusive = true }
                 }
             } else {
-                val errorMessage = task.exception?.message ?: "Login failed"
                 coroutineScope.launch {
-                    snackbarHostState.showSnackbar(errorMessage)
+                    snackbarHostState.showSnackbar("Login failed, please try again!")
                 }
             }
         }
 }
-
 
 @Preview(showBackground = true, name = "Login Screen")
 @Composable

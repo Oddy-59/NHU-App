@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 // Primary colors (light mode)
 val TealPrimary = Color(0xFF00796B)
-val IndigoSecondary = Color(0xFF3F51B5)
+val IndigoSecondary = Color(0xFF3F51B5) // 0xFF3F51B5
 val AmberTertiary = Color(0xFFFFC107)
 
 // Primary colors (dark mode)

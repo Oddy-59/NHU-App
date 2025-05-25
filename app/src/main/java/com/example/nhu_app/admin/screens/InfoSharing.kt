@@ -8,12 +8,15 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavHostController
@@ -30,37 +33,111 @@ data class GameImage(val imageUri: String?, val title: String)
 
 val db = FirebaseFirestore.getInstance()
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InfoSharing(navController: NavHostController) {
+    val db = FirebaseFirestore.getInstance()
     var showNewsForm by remember { mutableStateOf(false) }
     var showScoreForm by remember { mutableStateOf(false) }
     var showImageForm by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
-    Column(Modifier.padding(16.dp)) {
-        BoxItemIS("Post News") { showNewsForm = !showNewsForm }
-        if (showNewsForm) {
-            NewsForm { news ->
-                db.collection("news").add(news)
-                    .addOnSuccessListener { Log.d("Firestore", "News posted") }
-                    .addOnFailureListener { e -> Log.e("Firestore", "Error posting news", e) }
-                showNewsForm = false
-            }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Dashboard",
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            )
         }
-
-        BoxItemIS("Post Score") { showScoreForm = !showScoreForm }
-        if (showScoreForm) {
-            ScoreForm { score ->
-                db.collection("scores").add(score)
-                    .addOnSuccessListener { Log.d("Firestore", "Score posted") }
-                    .addOnFailureListener { e -> Log.e("Firestore", "Error posting score", e) }
-                showScoreForm = false
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            item {
+                Text(
+                    text = "Share News, Scores, and Highlights",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        color = MaterialTheme.colorScheme.onBackground
+                    ),
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
             }
-        }
 
-        BoxItemIS("Highlights Image") { showImageForm = !showImageForm }
-        if (showImageForm) {
-            GameImageForm {
-                showImageForm = false
+            item {
+                BoxItemIS("Post News") {
+                    showNewsForm = !showNewsForm
+                    showScoreForm = false
+                    showImageForm = false
+                }
+            }
+            if (showNewsForm) {
+                item {
+                    NewsForm { news ->
+                        db.collection("news").add(news)
+                            .addOnSuccessListener {
+                                Toast.makeText(context, "News posted successfully!", Toast.LENGTH_SHORT).show()
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(context, "Failed to post news.", Toast.LENGTH_SHORT).show()
+                            }
+                        showNewsForm = false
+                    }
+                }
+            }
+
+            item {
+                BoxItemIS("Post Score") {
+                    showScoreForm = !showScoreForm
+                    showNewsForm = false
+                    showImageForm = false
+                }
+            }
+            if (showScoreForm) {
+                item {
+                    ScoreForm { score ->
+                        db.collection("scores").add(score)
+                            .addOnSuccessListener {
+                                Toast.makeText(context, "Score posted successfully!", Toast.LENGTH_SHORT).show()
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(context, "Failed to post score.", Toast.LENGTH_SHORT).show()
+                            }
+                        showScoreForm = false
+                    }
+                }
+            }
+
+            item {
+                BoxItemIS("Highlights Image") {
+                    showImageForm = !showImageForm
+                    showNewsForm = false
+                    showScoreForm = false
+                }
+            }
+            if (showImageForm) {
+                item {
+                    GameImageForm {
+                        showImageForm = false
+                    }
+                }
             }
         }
     }
@@ -95,55 +172,66 @@ fun NewsForm(onSubmit: (NewsItem) -> Unit) {
         imageSelected = it != null
     }
 
-    Column(modifier = Modifier.padding(vertical = 8.dp)) {
-        OutlinedTextField(title, { title = it }, label = { Text("Title") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(description, { description = it }, label = { Text("Description") }, modifier = Modifier.fillMaxWidth().height(120.dp), maxLines = 5)
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            OutlinedTextField(title, { title = it }, label = { Text("Title") }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(
+                description, { description = it },
+                label = { Text("Description") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp),
+                maxLines = 5
+            )
 
-        Button(onClick = datePicker, modifier = Modifier.padding(top = 8.dp)) {
-            Text(if (date.isEmpty()) "Select Date" else "Date: $date")
-        }
+            Button(onClick = datePicker, modifier = Modifier.padding(top = 8.dp)) {
+                Text(if (date.isEmpty()) "Select Date" else "Date: $date")
+            }
 
-        Button(onClick = { imagePicker.launch("image/*") }, modifier = Modifier.padding(top = 8.dp)) {
-            Text(if (imageSelected) "Image Selected" else "Select Image")
-        }
+            Button(onClick = { imagePicker.launch("image/*") }, modifier = Modifier.padding(top = 8.dp)) {
+                Text(if (imageSelected) "Image Selected" else "Select Image")
+            }
 
-        if (error.isNotEmpty()) Text(error, color = Color.Red, fontSize = 14.sp)
+            if (error.isNotEmpty()) Text(error, color = Color.Red, fontSize = 14.sp)
 
-        Button(
-            onClick = {
-                if (title.text.isBlank() || description.text.isBlank() || date.isEmpty()) {
-                    error = "All fields are required."
-                } else {
-                    // Save the image to internal storage
-                    imageUri?.let { uri ->
-                        val inputStream = context.contentResolver.openInputStream(uri)
-                        val fileName = "news_image_${System.currentTimeMillis()}.jpg"
-                        val file = File(context.filesDir, fileName)
+            Button(
+                onClick = {
+                    if (title.text.isBlank() || description.text.isBlank() || date.isEmpty()) {
+                        error = "All fields are required."
+                    } else {
+                        imageUri?.let { uri ->
+                            val inputStream = context.contentResolver.openInputStream(uri)
+                            val fileName = "news_image_${System.currentTimeMillis()}.jpg"
+                            val file = File(context.filesDir, fileName)
 
-                        try {
-                            inputStream?.use { input ->
-                                FileOutputStream(file).use { output ->
-                                    input.copyTo(output)
+                            try {
+                                inputStream?.use { input ->
+                                    FileOutputStream(file).use { output ->
+                                        input.copyTo(output)
+                                    }
                                 }
+                                val filePath = file.absolutePath
+                                onSubmit(NewsItem(filePath, title.text, description.text, date))
+                            } catch (e: Exception) {
+                                error = "Error saving image: ${e.message}"
                             }
-                            val filePath = file.absolutePath
-                            // Submit the news item with the local file path
-                            onSubmit(NewsItem(filePath, title.text, description.text, date))
-                        } catch (e: Exception) {
-                            error = "Error saving image: ${e.message}"
+                        } ?: run {
+                            error = "Please select an image."
                         }
-                    } ?: run {
-                        error = "Please select an image."
                     }
-                }
-            },
-            modifier = Modifier.align(Alignment.End).padding(top = 12.dp)
-        ) {
-            Text("Post News")
+                },
+                modifier = Modifier.align(Alignment.End).padding(top = 12.dp)
+            ) {
+                Text("Post News")
+            }
         }
     }
 }
-
 
 @Composable
 fun ScoreForm(onSubmit: (Score) -> Unit) {
@@ -167,27 +255,34 @@ fun ScoreForm(onSubmit: (Score) -> Unit) {
         ).show()
     }
 
-    Column(modifier = Modifier.padding(vertical = 8.dp)) {
-        OutlinedTextField(teams, { teams = it }, label = { Text("Teams") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(score, { score = it }, label = { Text("Score") }, modifier = Modifier.fillMaxWidth())
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            OutlinedTextField(teams, { teams = it }, label = { Text("Teams") }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(score, { score = it }, label = { Text("Score") }, modifier = Modifier.fillMaxWidth())
 
-        Button(onClick = datePicker, modifier = Modifier.padding(top = 8.dp)) {
-            Text(if (date.isEmpty()) "Select Date" else "Date: $date")
-        }
+            Button(onClick = datePicker, modifier = Modifier.padding(top = 8.dp)) {
+                Text(if (date.isEmpty()) "Select Date" else "Date: $date")
+            }
 
-        if (error.isNotEmpty()) Text(error, color = Color.Red, fontSize = 14.sp)
+            if (error.isNotEmpty()) Text(error, color = Color.Red, fontSize = 14.sp)
 
-        Button(
-            onClick = {
-                if (teams.text.isBlank() || score.text.isBlank() || date.isEmpty()) {
-                    error = "All fields are required."
-                } else {
-                    onSubmit(Score(teams.text, score.text, date))
-                }
-            },
-            modifier = Modifier.align(Alignment.End).padding(top = 12.dp)
-        ) {
-            Text("Post Score")
+            Button(
+                onClick = {
+                    if (teams.text.isBlank() || score.text.isBlank() || date.isEmpty()) {
+                        error = "All fields are required."
+                    } else {
+                        onSubmit(Score(teams.text, score.text, date))
+                    }
+                },
+                modifier = Modifier.align(Alignment.End).padding(top = 12.dp)
+            ) {
+                Text("Post Score")
+            }
         }
     }
 }
@@ -209,77 +304,81 @@ fun GameImageForm(onSubmitDone: () -> Unit) {
         imageSelected = it != null
     }
 
-    Column(modifier = Modifier.padding(vertical = 8.dp)) {
-        OutlinedTextField(
-            value = title,
-            onValueChange = { title = it },
-            label = { Text("Title") },
-            modifier = Modifier.fillMaxWidth()
-        )
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            OutlinedTextField(
+                value = title,
+                onValueChange = { title = it },
+                label = { Text("Title") },
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-        Button(onClick = { imagePicker.launch("image/*") }) {
-            Text(if (imageSelected) "Image Selected" else "Select Image")
-        }
+            Button(onClick = { imagePicker.launch("image/*") }) {
+                Text(if (imageSelected) "Image Selected" else "Select Image")
+            }
 
-        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-        if (errorMessage.isNotEmpty()) {
-            Text(errorMessage, color = Color.Red)
-        }
+            if (errorMessage.isNotEmpty()) {
+                Text(errorMessage, color = Color.Red)
+            }
 
-        Button(
-            onClick = onClick@{
-                if (title.text.isBlank() || imageUri == null) {
-                    errorMessage = "Please enter a title and select an image."
-                    return@onClick
-                }
-
-                isSubmitting = true
-                errorMessage = ""
-
-                // Save image to internal storage
-                val fileName = "game_image_${System.currentTimeMillis()}.jpg"
-                val file = File(context.filesDir, fileName)
-
-                try {
-                    val inputStream = context.contentResolver.openInputStream(imageUri!!)
-                    val outputStream = FileOutputStream(file)
-                    inputStream?.copyTo(outputStream)
-                    inputStream?.close()
-                    outputStream.close()
-                } catch (e: IOException) {
-                    errorMessage = "Error saving image: ${e.message}"
-                    isSubmitting = false
-                    return@onClick
-                }
-
-                // Store path in Firestore
-                val imageData = hashMapOf(
-                    "title" to title.text,
-                    "imagePath" to file.absolutePath,
-                    "timestamp" to System.currentTimeMillis().toString()
-
-                )
-
-                db.collection("gallery")
-                    .add(imageData)
-                    .addOnSuccessListener {
-                        Toast.makeText(context, "Highlight shared!", Toast.LENGTH_SHORT).show()
-                        onSubmitDone()
+            Button(
+                onClick = onClick@{
+                    if (title.text.isBlank() || imageUri == null) {
+                        errorMessage = "Please enter a title and select an image."
+                        return@onClick
                     }
-                    .addOnFailureListener {
-                        errorMessage = "Failed to upload: ${it.message}"
-                    }
-                    .addOnCompleteListener {
+
+                    isSubmitting = true
+                    errorMessage = ""
+
+                    val fileName = "game_image_${System.currentTimeMillis()}.jpg"
+                    val file = File(context.filesDir, fileName)
+
+                    try {
+                        val inputStream = context.contentResolver.openInputStream(imageUri!!)
+                        val outputStream = FileOutputStream(file)
+                        inputStream?.copyTo(outputStream)
+                        inputStream?.close()
+                        outputStream.close()
+                    } catch (e: IOException) {
+                        errorMessage = "Error saving image: ${e.message}"
                         isSubmitting = false
+                        return@onClick
                     }
-            },
-            enabled = !isSubmitting,
-            modifier = Modifier.align(Alignment.End)
-        ) {
-            Text(if (isSubmitting) "Sharing..." else "Share Image")
+
+                    val imageData = hashMapOf(
+                        "title" to title.text,
+                        "imagePath" to file.absolutePath,
+                        "timestamp" to System.currentTimeMillis().toString()
+                    )
+
+                    db.collection("gallery")
+                        .add(imageData)
+                        .addOnSuccessListener {
+                            Toast.makeText(context, "Highlight shared!", Toast.LENGTH_SHORT).show()
+                            onSubmitDone()
+                        }
+                        .addOnFailureListener {
+                            errorMessage = "Failed to upload: ${it.message}"
+                        }
+                        .addOnCompleteListener {
+                            isSubmitting = false
+                        }
+                },
+                enabled = !isSubmitting,
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text(if (isSubmitting) "Sharing..." else "Share Image")
+            }
         }
     }
 }
@@ -287,15 +386,23 @@ fun GameImageForm(onSubmitDone: () -> Unit) {
 @Composable
 fun BoxItemIS(label: String, onClick: () -> Unit) {
     Surface(
-        tonalElevation = 4.dp, shadowElevation = 4.dp,
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).clickable { onClick() }
+        tonalElevation = 2.dp, shadowElevation = 4.dp,
+        shape = RoundedCornerShape(10.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
     ) {
         Box(
-            Modifier.background(Color(0xFFE0E0E0)).height(60.dp).padding(horizontal = 20.dp),
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.secondaryContainer)
+                .padding(vertical = 16.dp, horizontal = 20.dp),
             contentAlignment = Alignment.CenterStart
         ) {
-            Text(label, fontSize = 16.sp, color = Color.Black)
+            Text(
+                text = label,
+                fontSize = 17.sp,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
         }
     }
 }
