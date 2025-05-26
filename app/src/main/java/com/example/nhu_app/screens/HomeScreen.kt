@@ -1,5 +1,6 @@
 package com.example.nhu_app.screens
 
+import DrawerContent
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,9 +16,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,9 +32,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.nhu_app.R
 import com.example.nhu_app.components.BottomNavigationItem
-import DrawerContent
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
 import com.example.nhu_app.models.NewsItem
 import com.example.nhu_app.models.ScoreItem
 import com.example.nhu_app.models.GalleryItem
@@ -106,16 +108,12 @@ fun HomeScreen(navController: NavController) {
                             modifier = Modifier.fillMaxWidth(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                                 Image(
-                                    painter = painterResource(R.drawable.logo2), // Replace with your actual logo resource
+                                    painter = painterResource(R.drawable.logo2),
                                     contentDescription = "NHU Logo",
-                                    modifier = Modifier
-                                        .size(47.dp)
-                                        .padding(end = 5.dp),
-                                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary) // Match text color
+                                    modifier = Modifier.size(47.dp).padding(end = 5.dp),
+                                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                                 )
                                 Text(
                                     text = "NHU HOME",
@@ -126,9 +124,7 @@ fun HomeScreen(navController: NavController) {
                             }
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
                 )
             },
             bottomBar = {
@@ -178,9 +174,7 @@ fun HomeScreen(navController: NavController) {
                                     Card(
                                         onClick = { navController.navigate(Screen.News.route) },
                                         modifier = Modifier.fillMaxWidth(),
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.secondaryContainer
-                                        ),
+                                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
                                         shape = RoundedCornerShape(12.dp)
                                     ) {
                                         Column(Modifier.padding(16.dp)) {
@@ -227,9 +221,7 @@ fun HomeScreen(navController: NavController) {
                                     Card(
                                         modifier = Modifier.fillMaxWidth(),
                                         shape = RoundedCornerShape(12.dp),
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.secondaryContainer
-                                        )
+                                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
                                     ) {
                                         Column(Modifier.padding(16.dp)) {
                                             Text(
@@ -276,21 +268,41 @@ fun HomeScreen(navController: NavController) {
 
                                     Card(
                                         shape = RoundedCornerShape(12.dp),
-                                        modifier = Modifier.size(160.dp),
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = Color.Transparent
-                                        ),
+                                        modifier = Modifier.size(200.dp),
+                                        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                                         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                                     ) {
                                         bitmap?.let {
-                                            Image(
-                                                bitmap = it,
-                                                contentDescription = image.title,
-                                                contentScale = ContentScale.Crop,
+                                            Box(
                                                 modifier = Modifier
                                                     .fillMaxSize()
                                                     .clip(RoundedCornerShape(12.dp))
-                                            )
+                                            ) {
+                                                Image(
+                                                    bitmap = it,
+                                                    contentDescription = image.title,
+                                                    contentScale = ContentScale.Crop,
+                                                    modifier = Modifier.matchParentSize()
+                                                )
+
+                                                // Text overlaid inside image, at bottom
+                                                Text(
+                                                    text = image.title,
+                                                    color = Color.White,
+                                                    fontSize = 16.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    modifier = Modifier
+                                                        .align(Alignment.BottomStart)
+                                                        .padding(8.dp), // inside the image
+                                                    style = LocalTextStyle.current.copy(
+                                                        shadow = Shadow(
+                                                            color = Color.Black,
+                                                            offset = Offset(3f, 3f),
+                                                            blurRadius = 6f
+                                                        )
+                                                    )
+                                                )
+                                            }
                                         }
                                     }
                                 }
@@ -321,12 +333,12 @@ fun TeamsSection() {
     LaunchedEffect(Unit) {
         val db = FirebaseFirestore.getInstance()
         db.collection("teams")
-            .limit(7) // Fetch up to 20 teams
+            .limit(7)
             .get()
             .addOnSuccessListener { result ->
                 val allTeams = result.mapNotNull { it.getString("teamName") }.shuffled()
                 teams.clear()
-                teams.addAll(allTeams.take(4)) // Show only 5 random teams
+                teams.addAll(allTeams.take(4))
                 isLoading = false
             }
             .addOnFailureListener {
@@ -346,17 +358,12 @@ fun TeamsSection() {
                 items(teams) { team ->
                     Card(
                         shape = RoundedCornerShape(10.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
-                        ),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
                         modifier = Modifier
                             .width(150.dp)
                             .height(80.dp)
                     ) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                             Text(
                                 text = team,
                                 fontSize = 14.sp,
@@ -371,10 +378,8 @@ fun TeamsSection() {
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun PreviewHomeScreen() {
-    val navController = rememberNavController()
-    HomeScreen(navController = navController)
+    HomeScreen(navController = rememberNavController())
 }

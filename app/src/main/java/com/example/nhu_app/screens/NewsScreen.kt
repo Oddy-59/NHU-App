@@ -171,6 +171,8 @@ fun NewsScreen(navController: NavController) {
                                 .background(MaterialTheme.colorScheme.background) ,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+                            Spacer(modifier = Modifier.height(20.dp))
+
                             Text(
                                 text = "Latest Hockey Articles",
                                 fontSize = 24.sp,
@@ -178,7 +180,9 @@ fun NewsScreen(navController: NavController) {
                                 color = MaterialTheme.colorScheme.onBackground,
                                 modifier = Modifier.padding(bottom = 16.dp)
                             )
+
                             Spacer(modifier = Modifier.height(20.dp))
+
                             LazyColumn {
                                 items(newsList) { news ->
                                     NewsCard(newsItem = news, navController = navController)
@@ -209,7 +213,7 @@ fun NewsCard(newsItem: NewsItem, navController: NavController) {
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
-
+            Spacer(modifier = Modifier.height(5.dp))
             newsItem.imageUri?.let {
                 Image(
                     painter = rememberAsyncImagePainter(model = "file://$it"),

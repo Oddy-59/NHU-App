@@ -38,7 +38,7 @@ data class Club(
     val name: String = "",
     val coach: String = "",
     val description: String = "",
-    val contact: String = "",
+    val cellNumber: String = "",
     val imageUrl: String = ""
 )
 
@@ -243,7 +243,7 @@ fun AddOrEditClubForm(
 
     var name by remember { mutableStateOf(TextFieldValue(club?.name ?: "")) }
     var coach by remember { mutableStateOf(TextFieldValue(club?.coach ?: "")) }
-    var contact by remember { mutableStateOf(TextFieldValue(club?.contact ?: "")) }
+    var cellNumber by remember { mutableStateOf(TextFieldValue(club?.cellNumber ?: "")) }
     var description by remember { mutableStateOf(TextFieldValue(club?.description ?: "")) }
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
@@ -275,7 +275,7 @@ fun AddOrEditClubForm(
         Column(modifier = Modifier.padding(16.dp)) {
             buildField(label = "Name", value = name, onChange = { name = it })
             buildField(label = "Representative", value = coach, onChange = { coach = it })
-            buildField(label = "Cell Number", value = contact, onChange = { contact = it })
+            buildField(label = "Cell Number", value = cellNumber, onChange = { cellNumber = it })
 
             buildField("Description", description, onChange = { description = it }, singleLine = false)
 
@@ -314,7 +314,7 @@ fun AddOrEditClubForm(
             Button(
                 enabled = !isUploading,
                 onClick = {
-                    if (name.text.isBlank() || coach.text.isBlank() || contact.text.isBlank()) {
+                    if (name.text.isBlank() || coach.text.isBlank() || cellNumber.text.isBlank()) {
                         Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
                         return@Button
                     }
@@ -333,7 +333,7 @@ fun AddOrEditClubForm(
                                 id = clubId,
                                 name = name.text,
                                 coach = coach.text,
-                                contact = contact.text,
+                                cellNumber = cellNumber.text,
                                 description = description.text,
                                 imageUrl = finalImageUrl
                             )
@@ -371,7 +371,7 @@ fun ClubListItem(club: Club, highlight: Boolean, onClick: () -> Unit) {
             .clickable { onClick() },
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (highlight) Color.DarkGray else MaterialTheme.colorScheme.surfaceVariant
+            containerColor = if (highlight) Color.DarkGray else colorScheme.surfaceVariant
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -394,7 +394,7 @@ fun ClubListItem(club: Club, highlight: Boolean, onClick: () -> Unit) {
             Text(
                 text = club.name,
                 fontSize = 15.sp,
-                color = if (highlight) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                color = if (highlight) Color.White else colorScheme.onSurfaceVariant
             )
         }
     }

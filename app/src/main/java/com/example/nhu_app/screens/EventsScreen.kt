@@ -105,7 +105,7 @@ fun EventsScreen(navController: NavController) {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = "Upcoming Events:",
                         fontSize = 20.sp, // same as Latest News header font size

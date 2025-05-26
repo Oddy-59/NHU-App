@@ -34,6 +34,9 @@ import kotlinx.coroutines.launch
 fun ClubsScreen(navController: NavController) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    var isLoading by remember { mutableStateOf(true) }
+    var isEmpty by remember { mutableStateOf(false) }
+
 
     val clubs = remember { mutableStateListOf<Club>() }
     var expandedClubId by remember { mutableStateOf<String?>(null) }
@@ -49,6 +52,12 @@ fun ClubsScreen(navController: NavController) {
                     val club = doc.toObject(Club::class.java)
                     clubs.add(club)
                 }
+                isLoading = false
+                isEmpty = clubs.isEmpty()
+            }
+            .addOnFailureListener {
+                isLoading = false
+                isEmpty = true
             }
     }
 
@@ -109,36 +118,52 @@ fun ClubsScreen(navController: NavController) {
                 }
             }
         ) { paddingValues ->
-            if (clubs.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        "Loading clubs...",
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(8.dp),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(clubs, key = { it.id }) { club ->
-                        ClubCard(
-                            club = club,
-                            expanded = club.id == expandedClubId,
-                            onClick = {
-                                expandedClubId = if (expandedClubId == club.id) null else club.id
-                            }
+
+                isEmpty -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No clubs available.",
+                            color = MaterialTheme.colorScheme.onBackground
                         )
+                    }
+                }
+
+                else -> {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        contentPadding = PaddingValues(8.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(clubs, key = { it.id }) { club ->
+                            ClubCard(
+                                club = club,
+                                expanded = club.id == expandedClubId,
+                                onClick = {
+                                    expandedClubId =
+                                        if (expandedClubId == club.id) null else club.id
+                                }
+                            )
+                        }
                     }
                 }
             }

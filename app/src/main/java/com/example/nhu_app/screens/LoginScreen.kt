@@ -252,7 +252,7 @@ fun LoginScreen(navController: NavController) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.4f)),
+                        .background(color = colorScheme.primary.copy(alpha = 0.4f)),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(color = colorScheme.primary)

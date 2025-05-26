@@ -39,7 +39,7 @@ fun DrawerContent(
             .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp)
     ) {
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = "More options",
             fontSize = 20.sp,
@@ -47,7 +47,7 @@ fun DrawerContent(
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 20.dp)
         )
-        Spacer(modifier = Modifier.height(25.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         // Static list with icons
         // Static list with icons and themed text
         val items = listOf(
@@ -71,27 +71,26 @@ fun DrawerContent(
                     painter = painterResource(id = iconRes),
                     contentDescription = label,
                     modifier = Modifier
-                        .size(28.dp)
+                        .size(29.dp)
                         .padding(end = 12.dp)
                 )
                 Text(
                     text = label,
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Medium
+                    fontSize = 17.sp,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
 
         Spacer(modifier = Modifier.weight(1f)) // Push bottom items to bottom
 
-        Divider(
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
-            thickness = 1.dp,
+        HorizontalDivider(
             modifier = Modifier
                 .width(drawerWidth * 0.75f)
                 .align(Alignment.CenterHorizontally)
-                .padding(bottom = 12.dp)
+                .padding(bottom = 12.dp),
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
         )
 
         // Login As Admin
@@ -99,7 +98,7 @@ fun DrawerContent(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 10.dp)
+                .padding(vertical = 15.dp)
                 .clickable {
                     scope.launch { drawerState.close() }
                     navController.navigate("login")
@@ -109,13 +108,13 @@ fun DrawerContent(
                 painter = painterResource(id = R.drawable.ic_admin),
                 contentDescription = "Login",
                 modifier = Modifier
-                    .size(28.dp)
+                    .size(35.dp)
                     .padding(end = 12.dp),
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
             )
             Text(
                 text = "Login As Admin",
-                fontSize = 16.sp,
+                fontSize = 17.sp,
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
@@ -125,19 +124,19 @@ fun DrawerContent(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 10.dp),
+                .padding(vertical = 15.dp),
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_settings),
                 contentDescription = "Settings",
                 modifier = Modifier
-                    .size(28.dp)
+                    .size(33.dp)
                     .padding(end = 12.dp),
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
             )
             Text(
                 text = "Settings",
-                fontSize = 16.sp,
+                fontSize = 17.sp,
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
